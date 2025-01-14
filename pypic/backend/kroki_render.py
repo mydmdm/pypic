@@ -6,10 +6,7 @@ from .base_render import RenderBase
 
 
 class KrokiRender(RenderBase):
-    """Kroki backend for PyPIC.
-    Reference:
-    - Kroki homepage: https://kroki.io/
-    """
+    """Kroki backend for PyPIC."""
 
     url_template = "https://kroki.io/{img_lang}/{img_format}/{img_src}"
 
