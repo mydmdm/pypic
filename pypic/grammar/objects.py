@@ -15,6 +15,7 @@ shape_objects: tuple[str, ...] = (
     "ellipse",
     "file",
     "oval",
+    "dot",
 )
 
 

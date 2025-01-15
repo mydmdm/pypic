@@ -7,7 +7,7 @@ class PikchrContext:
 
     def __init__(self):
         self.sources :list[PikchrObject] = [] # lines of code (source diagram script)
-
+        self.image_bytes :bytes = None # placeholder to save created image
         for s in all_objects():
             setattr(self, s, lambda *attributes, obj_type=s: self.new_obj(obj_type, *attributes))
 

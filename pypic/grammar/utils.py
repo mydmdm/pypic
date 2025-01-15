@@ -5,7 +5,7 @@ class Stream:
     When adding tokens, the tokens are formatted (__format__) and appended to the container.
     """
 
-    __input_format_hook__ = format
+    __input_format_hook__ = lambda self, x: format(x)
     __output_separator__ = " "
 
     def __init__(self, *args):
@@ -24,7 +24,7 @@ class Stream:
 class text(Stream):
     """tokens in text are enclosed by double quotes."""
 
-    __input_format_hook__ = lambda x: f"\"{x}\""
+    __input_format_hook__ = lambda self, x: f"\"{x}\""
 
 
 

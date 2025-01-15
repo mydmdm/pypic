@@ -1,5 +1,6 @@
-from .grammer.context import PikchrContext
-from .backend import get_render, RenderBase
+from .grammar.context import PikchrContext
+from .backend import RenderPipeline, KrokiRender, RenderBase, ipython_display_image
+from .utils import FileWriter
 
 
 class pikchr:
@@ -12,26 +13,32 @@ class pikchr:
     """
 
     def __init__(
-        self,
-        render: RenderBase = None,  # render object
-        show_image: bool = False,  # show the diagram after exiting the context
+        self, /,
+        print_script: bool = True,  # print the script after exiting the context
+        display_image: bool = False,  # show the diagram after exiting the context
+        output_prefix: str = None,  # prefix to save output
+        output_format: str = "svg",  # output format for the diagram
+        render: RenderBase = None,  # render function to use
     ):
         self.context = PikchrContext()
-        self.render = render
-        self.show_diagram = show_image
+        self.pipeline = RenderPipeline(render or KrokiRender())
+        if display_image:
+            self.pipeline.image_bytes_hooks.append(ipython_display_image)
+        if print_script:
+            self.pipeline.script_hooks.append(print)
+        if output_prefix:
+            script_file = FileWriter(f"{output_prefix}.pikchr", "w")
+            self.pipeline.script_hooks.append(script_file.write)
+            img_file = FileWriter(f"{output_prefix}.{output_format}", "wb")
+            self.pipeline.image_bytes_hooks.append(img_file.write)
+
 
     def __enter__(self):
         return self.context
 
     def __exit__(self, exc_type, exc_value, traceback):
-        if self.render is not None:
-            self.render(str(self.context))
-        if self.show_diagram:
-            src_code = str(self.context)
-            if self.render is not None:
-                try:
-                    self.render(src_code, show=True)
-                except Exception as e:
-                    print(str(e))
-            else:
-                print(src_code)
+        try:
+            self.context.image_bytes = self.pipeline(str(self.context))
+        except Exception as e:
+            print(e)
+
